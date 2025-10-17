@@ -1,3 +1,5 @@
 <template>
-  Contact view
+  <div>
+    <h1>Contact page</h1>
+  </div>
 </template>
