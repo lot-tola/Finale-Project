@@ -13,13 +13,13 @@
   border-radius: 4px;
 }
 
-.block {
+.rgbBlock {
   position: relative;
 
 }
 
-.block:before,
-.block:after {
+.rgbBlock:before,
+.rgbBlock:after {
   content: '';
   position: absolute;
   left: -2px;
@@ -28,8 +28,8 @@
   height: calc(100% + 4px);
   z-index: -5;
 }
-.block:hover:before,
-.block:hover:after {
+.rgbBlock:hover:before,
+.rgbBlock:hover:after {
   background: linear-gradient(
     45deg,
     #fb0094,
@@ -60,7 +60,7 @@
   }
 }
 
-.block:after {
+.rgbBlock:after {
   filter: blur(50px);
 }
 

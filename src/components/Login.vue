@@ -18,7 +18,7 @@ const handleSubmit = async () => {
     password: password.value,
   }
   try {
-    const resp = await axios.post('http://54.179.74.122:8080/api/v1/login', loginObj)
+    const resp = await axios.post('https://eduvision.live/api/login', loginObj)
     if (resp.data.success) {
       const jwtToken = resp.data.data.token
       setToken(jwtToken)

@@ -74,16 +74,43 @@ const handleLogout = () => {
           </li>
         </ul>
       </div>
-      <img class="w-25" src="/logo-nobg.png" alt="logo" />
+      <img class="w-20" src="/logo-nobg.png" alt="logo" />
       <p v-if="authenticated" class="text-xs font-ultra">{{ name }}</p>
     </div>
+
+    <!-- Big Display -->
     <div class="hidden lg:flex items-center justify-evenly w-full">
-      <img class="w-[130px] h-[100px]" src="/logo-nobg.png" alt="logo" />
+      <router-link class="flex items-center" to="/">
+        <img class="w-[120px] h-[90px]" src="/logo-nobg.png" alt="logo" />
+        <p class="text-lg font-corben ml-1">EduVision</p>
+      </router-link>
 
       <ul class="flex gap-5">
         <RouterLink class="button" to="/"><span>Home</span></RouterLink>
         <RouterLink class="button" to="/about"><span>About</span></RouterLink>
-        <RouterLink class="button" to="/opportunities"><span>Opportunities</span></RouterLink>
+        <div class="button group relative z-40">
+          <span class="">
+            <RouterLink to="/opportunities">Opportunities</RouterLink>
+          </span>
+          <div
+            class="bg-base-400 border-1 border-gray-400/50 py-4 rounded-lg absolute left-1/2 transform -translate-x-1/2 w-70 h-fit p-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <ul class="flex flex-col items-center gap-5 text-sm">
+              <router-link
+                class="border-1 w-[90%] p-3 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
+                to="/valid-opportunities"
+              >
+                Valid Opportunities
+              </router-link>
+              <router-link
+                class="border-1 w-[90%] p-3 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
+                to="/opportunities"
+              >
+                All Opportunities
+              </router-link>
+            </ul>
+          </div>
+        </div>
         <RouterLink class="button" to="/contact"><span>Contact</span></RouterLink>
       </ul>
       <div v-if="authenticated" class="flex gap-4 items-center">
@@ -91,7 +118,8 @@ const handleLogout = () => {
         <button @click="handleLogout" class="button"><span>Logout</span></button>
       </div>
       <div class="flex gap-3 items-center" v-else>
-        <RouterLink class="button" to="/login"><span>Login</span></RouterLink>
+        <router-link class="button" to="/login"><span>Login</span></router-link>
+        <router-link class="button" to="/register"><span>Sign Up</span></router-link>
       </div>
     </div>
   </nav>

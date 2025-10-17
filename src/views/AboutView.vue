@@ -48,7 +48,7 @@
       class="flex flex-col items-center my-10 mx-5 justify-evenly h-[600px] border-1 border-white/50 rounded-lg md:hidden"
     >
       <div class="flex flex-col items-center w-[90%]">
-        <img src="/logo.png" alt="" class="w-30" />
+        <img src="/lottola.jpg" alt="" class="w-30" />
         <div class="">
           <h2 class="text-center font-corben font-bold mt-3">LOT TOLA</h2>
           <p class="text-xs italic opacity-50 mt-3">FRONTEND DEV</p>
@@ -59,7 +59,7 @@
         </div>
       </div>
       <div class="flex flex-col items-center w-[90%]">
-        <img src="/logo.png" alt="" class="w-30" />
+        <img src="/kienghok.png" alt="" class="w-30" />
         <div class="">
           <h2 class="text-center font-corben font-bold mt-3">KHEAV KIENGHOK</h2>
           <p class="text-xs italic opacity-50 mt-3">BACKEND DEV</p>
@@ -70,12 +70,16 @@
         </div>
       </div>
     </div>
-    <div class="border-2 m-19 h-[1200px] hidden md:grid grid-cols-2 grid-rows-2 mb-10 rounded-lg">
-      <img src="/logo.png" alt="" class="col-start-1 w-full h-full" />
-      <div class="col-start-2 flex flex-col items-baseline justify-center w-[80%] mx-10 gap-5">
-        <h2 class="font-corben text-5xl font-extrabold tracking-widest">LOT TOLA</h2>
+
+    <!-- Bigger Display -->
+    <div
+      class="border-2 m-19 h-[1400px] mx-auto max-w-[80%] hidden md:grid grid-cols-2 grid-rows-2 mb-10 rounded-lg"
+    >
+      <img src="/lottola.jpg" alt="" class="col-start-1 my-auto rounded-lg max-w-[80%] mx-auto" />
+      <div class="col-start-2 flex flex-col items-baseline justify-center mx-10 gap-5">
+        <h2 class="font-corben text-5xl/relaxed font-extrabold tracking-widest">LOT TOLA</h2>
         <p class="italic opacity-50">FRONTEND DEV</p>
-        <p class="italic text-xl font-light">
+        <p class="italic text-xl/relaxed font-light">
           Makes sure every pixel behaves and every button obeys. Sometimes argues with CSS,
           sometimes wins, sometimes cries a little.
         </p>
@@ -83,16 +87,23 @@
       <div
         class="col-start-1 row-start-2 flex flex-col items-baseline justify-center w-[80%] mx-10 gap-5"
       >
-        <h2 class="font-corben md:text-5xl text-sm font-extrabold tracking-widest">
+        <h2
+          class="font-corben md:text-2xl/relaxed lg:text-5xl/relaxed text-sm font-extrabold tracking-widest"
+        >
           KHEAV KIENGHOK
         </h2>
         <p class="italic opacity-50">BACKEND DEV</p>
-        <p class="italic text-xl font-light">
-          Keeps the servers alive and the data flowing. Talks to databases like they’re
-          pets—sometimes they bite. Powered by VibeCoding.
+        <p class="italic md:text-lg/relaxed lg:text-xl/relaxed font-light">
+          I speak to databases like they understand me, because code deserves conversation. My
+          servers don’t just run — they breathe life into data. I build tech with soul, not just
+          syntax.
         </p>
       </div>
-      <img src="/logo.png" alt="" class="col-start-2 w-full h-full row-start-2" />
+      <img
+        src="/kienghok.png"
+        alt=""
+        class="col-start-2 row-start-2 my-auto rounded-lg max-w-[80%] mx-auto"
+      />
     </div>
   </div>
 </template>

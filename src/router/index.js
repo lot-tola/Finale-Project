@@ -23,31 +23,21 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
     {
       path: '/opportunities',
       name: 'OpportunitiesView',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: OpportuinitiesView,
     },
     {
-      path: '/opportunities/:id',
-      name: 'FullInfo',
-      props: true,
-      component: () => import('../components/FullInfo.vue'),
+      path: '/valid-opportunities',
+      name: 'ValidOpportunitiesView',
+      component: OpportuinitiesView,
     },
     {
       path: '/contact',
       name: 'contact',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/ContactView.vue'),
     },
     {
@@ -84,6 +74,12 @@ router.beforeEach(async (to, from) => {
   }
   if (userRole !== 'admin' && to.name == 'create-opportunity') {
     return { name: 'unauthorized' }
+  }
+})
+
+router.beforeEach(async (to, from) => {
+  if (authenticated && (to.name == 'register' || to.name == 'login')) {
+    return { name: 'home' }
   }
 })
 

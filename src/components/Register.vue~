@@ -115,7 +115,7 @@ onMounted(async () => {
 <template>
   <div class="w-full max-h-full">
     <div
-      class="mx-auto border-1 mt-17 my-auto p-10 w-300 rounded-md bg-base-100 grid grid-cols-2 rgbBlock"
+      class="mx-auto border-1 mt-10 my-auto p-10 w-300 rounded-md bg-base-100 grid grid-cols-2 rgbBlock"
     >
       <!-- add image here -->
       <div class="col-start-1">
