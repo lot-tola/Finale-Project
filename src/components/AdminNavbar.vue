@@ -20,10 +20,6 @@
         <p class="text-xl font-ultra">{{ name }}</p>
         <button @click="handleLogout" class="button"><span>Logout</span></button>
       </div>
-      <div class="flex gap-3 items-center" v-else>
-        <router-link class="button" to="/login"><span>Login</span></router-link>
-        <router-link class="button" to="/register"><span>Sign Up</span></router-link>
-      </div>
     </div>
   </nav>
 </template>

@@ -69,7 +69,7 @@ const router = createRouter({
     },
     {
       path: '/admin/login',
-      name: 'admin-login',
+      name: 'AdminLogin',
       component: () => import('../views/AdminLoginView.vue'),
     },
     {
@@ -80,14 +80,17 @@ const router = createRouter({
   ],
 })
 
-// router.beforeEach(async (to, from) => {
-//   if (!authenticated && to.name == 'create-opportunity') {
-//     return { name: 'admin-login' }
-//   }
-//   if (userRole !== 'admin' && to.name == 'create-opportunity') {
-//     return { name: 'unauthorized' }
-//   }
-// })
+router.beforeEach(async (to, from) => {
+  if (!authenticated && to.name == 'create-opportunity') {
+    return { name: 'admin-login' }
+  }
+  if (
+    (userRole !== 'admin' && to.name == 'CreateOpportunity') ||
+    (userRole !== 'admin' && to.name == 'AdminDashboard')
+  ) {
+    return { name: 'unauthorized' }
+  }
+})
 
 router.beforeEach(async (to, from) => {
   if (authenticated && (to.name == 'register' || to.name == 'login')) {

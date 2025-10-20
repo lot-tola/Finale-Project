@@ -1,82 +1,153 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount, onMounted } from 'vue'
 import axios from 'axios'
 const email = ref('')
 const password = ref('')
 const errorState = ref('')
+const totp = ref('')
+const qrcode = ref('')
+const loading = ref(false)
+const errorMsg = ref('')
+let authToken = null
 
 const handleSubmit = async () => {
+  loading.value = true
   const loginObj = {
     email: email.value,
     password: password.value,
   }
-  const resp = await axios.post('https://eduvision.live/api/admin/login', JSON.stringify(loginObj))
-  let authToken = null
-  if (resp.data.success) {
-    console.log(resp.data.data.setup_token)
-    authToken = resp.data.data.setup_token
-  }
-  console.log('RESPONSE', resp.data)
-  await axios.post(
-    'https://eduvision.live/api/admin/enable-2fa',
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
+  try {
+    const resp = await axios.post(
+      'https://eduvision.live/api/admin/login',
+      JSON.stringify(loginObj),
+    )
+    if (resp.data.success) {
+      authToken = resp.data.data.temp_token
+    }
+    console.log('RESPONSE', resp.data.data)
+    console.log('TOKEN', authToken)
+    const verification = await axios.post(
+      'https://eduvision.live/api/admin/enable-2fa',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
       },
-    },
-  )
-  // try {
-  //   const resp = await axios.post("https://eduvision.live/api/v1/admin/login", JSON.stringify(loginObj))
-  //   console.log(resp.data)
-  //   if(resp.data.success){
-  //     const jwtToken = resp.data.data.token
-  //     console.log(resp.data)
-  //     const {role} = jwtDecode(jwtToken)
-  //     setToken(jwtToken)
-  //     setRole(role)
-  //     router.push({ name: "home"})
-  //   }
-  // }catch(err){
-  //   if (err.status === 401){
-  //     errorState.value = "Your credentials doesn't match our records."
-  //   }
-  // }
+    )
+    qrcode.value = verification.data.data.qr_code_url
+    loading.value = false
+  } catch (err) {
+    console.log('Error registering admin', err)
+    errorMsg.value = 'Something Went Wrong. Plase try again.'
+    loading.value = false
+  }
 }
+const handleBeforeUnload = (e) => {
+  e.preventDefault()
+  e.returnValue = ''
+}
+const handleVerification = async (e) => {
+  try {
+    e.preventDefault()
+    loading.value = true
+    const resp = await axios.post(
+      'https://eduvision.live/api/admin/verify-2fa',
+      { otp: totp.value },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    )
+    console.log(resp.data)
+  } catch (err) {
+    loading.value = false
+    errorMsg.value = 'Something Went Wrong. Please Try Again.'
+    console.log('Error verification', err)
+  }
+}
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
 </script>
 <template>
-  <div class="w-full h-screen grid place-content-center">
-    <div class="border-1 p-10 rounded-md block bg-base-100">
-      <h1 class="text-center text-2xl font-bold">Admin Login</h1>
-      <p class="text-center mt-3">Welcome back Admin!!</p>
-      <form @submit.prevent="handleSubmit" class="flex flex-col mt-9 items-center gap-10">
-        <label for="email">
-          <input
-            v-model="email"
-            type="email"
-            id="email"
-            name="email"
-            class="input input-primary"
-            required
-            placeholder="example@email.com"
+  <div class="w-full h-screen">
+    <div class="border-1 p-10 w-fit rounded-md rgbBlock bg-base-100 mx-auto mt-30">
+      <div v-if="errorMsg" role="alert" class="alert alert-error">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 shrink-0 stroke-current"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
-        </label>
-        <span v-if="errorState" class="input input-error">
-          {{ errorState }}
-        </span>
-        <label for="password">
+        </svg>
+        <span>{{ errorMsg }}</span>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-5" v-if="qrcode">
+        <p class="text-center text-xl/relaxed mb-3">
+          Please open your authenticator app and scan this QR code to enable 2 Factor Authentication
+        </p>
+        <img :src="qrcode" alt="" class="col-start-2" v-if="qrcode" />
+        <form @submit.prevent="handleVerification" class="flex flex-col mt-4 items-center gap-4">
           <input
-            type="password"
-            v-model="password"
-            id="password"
-            name="password"
+            type="text"
+            placeholder="Please enter 6 digits from your authenticator app."
             class="input input-primary"
-            required
-            placeholder="password"
+            v-model="totp"
           />
-        </label>
-        <button type="submit" class="btn btn-primary">Login</button>
-      </form>
+          <div v-if="loading" class="flex items-center gap-4">
+            <p>Please wait for a moment</p>
+            <span class="loading loading-dots loading-lg"></span>
+          </div>
+          <button class="button"><span>Verify</span></button>
+        </form>
+      </div>
+      <div class="" v-else>
+        <h1 class="text-center text-2xl font-bold">Admin Login</h1>
+        <p class="text-center mt-3">Welcome back Admin!!</p>
+        <form @submit.prevent="handleSubmit" class="flex flex-col mt-9 items-center gap-10">
+          <label for="email">
+            <input
+              v-model="email"
+              type="email"
+              id="email"
+              name="email"
+              class="input input-primary"
+              required
+              placeholder="example@email.com"
+            />
+          </label>
+          <span v-if="errorState" class="input input-error">
+            {{ errorState }}
+          </span>
+          <label for="password">
+            <input
+              type="password"
+              v-model="password"
+              id="password"
+              name="password"
+              class="input input-primary"
+              required
+              placeholder="password"
+            />
+          </label>
+          <div v-if="loading" class="flex items-center gap-4">
+            <p>Please wait for a moment</p>
+            <span class="loading loading-dots loading-lg"></span>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
     </div>
   </div>
 </template>

@@ -6,7 +6,13 @@ const route = useRoute()
 </script>
 <template>
   <div>
-    <AdminNavbar v-if="route.name == 'AdminDashboard' || route.name == 'CreateOpportunity'" />
+    <AdminNavbar
+      v-if="
+        route.name == 'AdminDashboard' ||
+        route.name == 'CreateOpportunity' ||
+        route.name == 'AdminLogin'
+      "
+    />
     <HomeNavbar v-else />
     <router-view v-slot="{ Component }">
       <keep-alive include="OpportunitiesView">
