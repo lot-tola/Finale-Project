@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, ref, computed, watch } from 'vue'
+import { reactive, onMounted, ref, computed, watch, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useDataStore } from '@/stores/dataStore'
 import { useRoute, useRouter } from 'vue-router'
@@ -74,6 +74,25 @@ onMounted(async () => {
       1000,
     )
 
+    const sizes = {
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    }
+
+    window.addEventListener('resize', () => {
+      // Update sizes
+      sizes.width = canvas.clientWidth
+      sizes.height = canvas.clientHeight
+
+      // Update camera
+      camera.aspect = sizes.width / sizes.height
+      camera.updateProjectionMatrix()
+
+      // Update renderer
+      renderer.setSize(sizes.width, sizes.height)
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    })
+
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true })
     renderer.setSize(canvas.clientWidth, canvas.clientHeight)
     renderer.setAnimationLoop(animate)
@@ -145,20 +164,42 @@ onMounted(async () => {
     }
   }
   initBrand3D()
+  console.log(scholarships.value)
+  onBeforeUnmount(() => {
+    cancelAnimationFrame(animationId)
+    if (renderer) {
+      renderer.dispose()
+    }
+    if (scene) {
+      scene.traverse((obj) => {
+        if (!obj.isMesh) return
+        if (obj.geometry) {
+          obj.geometry.dispose()
+        }
+        if (obj.material) {
+          if (Array.isArray(obj.material)) {
+            obj.material.forEach((mat) => mat.dispose())
+          } else {
+            material.dispose()
+          }
+        }
+      })
+    }
+  })
 })
 </script>
 <template>
   <!-- Component 1 -->
-  <div class="flex flex-col mt-15 max-w-full items-center justify-evenly mb-10 relative">
+  <div class="flex flex-col mt-15 w-full items-center justify-evenly mb-10 relative">
     <canvas id="brandname" class="w-full h-[500px] block mx-auto"></canvas>
-    <div class="w-full flex justify-end-safe absolute inset-0 top-200">
+    <div class="absolute top-130 left-10 z-5">
       <div class="relative group gap-3 pr-30">
         <i class="pi pi-filter text-2xl transition"></i>
         <div
-          class="absolute bg-base-100 text-white border-1 border-gray-400/50 rounded-lg transform -translate-x-1/2 group-hover:visible group-hover:opacity-100 invisible w-60 h-70"
+          class="absolute bg-base-100 text-white border-1 border-gray-400/50 rounded-lg group-hover:visible group-hover:opacity-100 invisible w-60 h-fit"
         >
           <p class="text-xl font-extrabold text-center mt-5">Category</p>
-          <ul class="flex flex-col items-center pt-5 gap-5">
+          <ul class="flex flex-col items-center gap-5 my-5">
             <li
               class="border-1 w-[90%] p-1 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
             >
@@ -167,7 +208,7 @@ onMounted(async () => {
             <li
               class="border-1 w-[90%] p-1 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
             >
-              Businness <
+              Businness
             </li>
 
             <li
@@ -255,7 +296,7 @@ onMounted(async () => {
       </div>
 
       <!-- Big display -->
-      <div class="md:block relative hidden overscroll-auto h-[900px] mt-70">
+      <div class="md:block relative hidden overscroll-auto h-[900px] mt-70 z-1">
         <div
           v-if="dat.photo_url"
           class="bg-no-repeat blur-[3px] bg-center bg-cover h-full absolute inset-0 -z-3"

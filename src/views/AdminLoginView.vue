@@ -10,13 +10,22 @@ const handleSubmit = async () => {
     email: email.value,
     password: password.value,
   }
-  console.log(loginObj)
-  console.log(JSON.stringify(loginObj))
-  const resp = await axios.post(
-    'https://eduvision.live/api/v1/admin/login',
-    JSON.stringify(loginObj),
-  )
+  const resp = await axios.post('https://eduvision.live/api/admin/login', JSON.stringify(loginObj))
+  let authToken = null
+  if (resp.data.success) {
+    console.log(resp.data.data.setup_token)
+    authToken = resp.data.data.setup_token
+  }
   console.log('RESPONSE', resp.data)
+  await axios.post(
+    'https://eduvision.live/api/admin/enable-2fa',
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    },
+  )
   // try {
   //   const resp = await axios.post("https://eduvision.live/api/v1/admin/login", JSON.stringify(loginObj))
   //   console.log(resp.data)

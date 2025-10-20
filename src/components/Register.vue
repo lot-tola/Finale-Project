@@ -22,7 +22,7 @@ const handleSubmit = async () => {
       password: password.value,
     })
     if (resp.data.success) {
-      router.push()
+      console.log(resp.data)
     }
     console.log(resp)
   } catch (err) {
@@ -75,6 +75,7 @@ onMounted(async () => {
   })
 
   const passwordInput = document.getElementById('password')
+  const confirmpasswordInput = document.getElementById('confirmpassword')
   const passwordMeter = document.getElementById('password-meter')
   const showPasswordCheckbox = document.getElementById('show-password')
 
@@ -92,6 +93,7 @@ onMounted(async () => {
   })
   showPasswordCheckbox.addEventListener('change', () => {
     passwordInput.type = showPasswordCheckbox.checked ? 'text' : 'password'
+    confirmpassword.type = showPasswordCheckbox.checked ? 'text' : 'password'
   })
   function getPasswordStrength(password) {
     let score = 0
@@ -178,10 +180,6 @@ onMounted(async () => {
                 placeholder="password"
               />
             </label>
-            <label for="show-password" class="flex justify-center items-center gap-4 mt-3">
-              <input type="checkbox" id="show-password" />
-              <p class="text-gray-400/50">Show password</p>
-            </label>
             <div id="password-meter" class="text-black p-2 rounded-lg"></div>
           </div>
           <label for="confirmpassword">
@@ -193,10 +191,14 @@ onMounted(async () => {
               class="input input-primary"
               required
               placeholder="confirm password"
-              minlength="12"
-              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{12,}"
+              minlength="8"
+              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
               title="Must contain at least one number, one uppercase and one lowercase letter, and at least 12 or more characters"
             />
+          </label>
+          <label for="show-password" class="flex justify-center items-center gap-4 mt-3">
+            <input type="checkbox" id="show-password" />
+            <p class="text-gray-400/50">Show password</p>
           </label>
           <span v-if="password != confirmPassword" class="input input-error">
             The password does not match

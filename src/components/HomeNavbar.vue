@@ -27,51 +27,40 @@ const handleLogout = () => {
     class="flex justify-between lg:justify-center lg:gap-30 items-center p-7 text-3xl flex-nowrap"
   >
     <div class="lg:hidden dropdown flex items-center justify-evenly w-full">
-      <div class="btn btn-primary flex flex-col">
-        <svg
-          tabindex="0"
-          role="button"
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 relative outline-none"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h7"
-          />
-        </svg>
+      <div class="btn btn-primary flex flex-col relative">
+        <input type="checkbox" id="menu-toggle" class="peer hidden" />
+        <label for="menu-toggle" class="cursor-pointer">
+          <i class="pi pi-bars"></i>
+        </label>
         <ul
-          tabindex="-1"
-          class="absolute top-[100%] menu menu-sm dropdown-content bg-[#422ad5] rounded-box z-1 w-52 p-2 shadow flex flex-col items-baseline ml-4 justify-evenly min-h-[200px]"
+          class="rounded-box invisible absolute top-10 peer-checked:visible bg-[#793ef9] w-52 p-2 shadow flex flex-col gap-3 py-3 mt-3 items-center ml-4 justify-evenly min-h-[200px]"
         >
-          <li class="">
-            <RouterLink class="" to="/">Home</RouterLink>
-          </li>
-          <li>
-            <RouterLink class="" to="/about">About</RouterLink>
-          </li>
-          <li>
-            <RouterLink class="" to="/opportunities">Opportunities</RouterLink>
-          </li>
-          <li>
-            <RouterLink class="" to="/contact">Contact</RouterLink>
-          </li>
-          <li @click.prevent="handleLogout" v-if="authenticated">
+          <router-link to="/" class="border-1 w-[90%] py-1.5 rounded-lg"> Home </router-link>
+          <router-link to="/about" class="border-1 w-[90%] py-1.5 rounded-lg"> About </router-link>
+          <router-link to="/opportunities" class="border-1 w-[90%] py-1.5 rounded-lg">
+            Opportunities
+          </router-link>
+          <router-link to="/contact" class="border-1 w-[90%] py-1.5 rounded-lg">
+            Contact
+          </router-link>
+          <div
+            class="border-1 w-[90%] py-1.5 rounded-lg"
+            @click.prevent="handleLogout"
+            v-if="authenticated"
+          >
             <div>
               <p>Sign Out</p>
               <i class="pi pi-sign-out"></i>
             </div>
-          </li>
-          <li v-else>
-            <router-link to="/login">
-              <p>Sign In</p>
-              <i class="pi pi-sign-in"></i>
-            </router-link>
-          </li>
+          </div>
+          <router-link
+            to="/login"
+            v-else
+            class="border-1 w-[90%] py-1.5 rounded-lg flex gap-3 justify-center"
+          >
+            Sign In
+            <i class="pi pi-sign-in"></i>
+          </router-link>
         </ul>
       </div>
       <img class="w-20" src="/logo-nobg.png" alt="logo" />
@@ -86,14 +75,14 @@ const handleLogout = () => {
       </router-link>
 
       <ul class="flex gap-5">
-        <RouterLink class="button" to="/"><span>Home</span></RouterLink>
-        <RouterLink class="button" to="/about"><span>About</span></RouterLink>
+        <router-link class="button" to="/"><span>Home</span></router-link>
+        <router-link class="button" to="/about"><span>About</span></router-link>
         <div class="button group relative z-40">
           <span class="">
-            <RouterLink to="/opportunities">Opportunities</RouterLink>
+            <router-link to="/opportunities">Opportunities</router-link>
           </span>
           <div
-            class="bg-base-400 border-1 border-gray-400/50 py-4 rounded-lg absolute left-1/2 transform -translate-x-1/2 w-70 h-fit p-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300"
+            class="bg-base-400 py-7 rounded-lg absolute left-1/2 transform -translate-x-1/2 w-70 h-fit p-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300"
           >
             <ul class="flex flex-col items-center gap-5 text-sm">
               <router-link

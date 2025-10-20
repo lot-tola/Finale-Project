@@ -39,16 +39,11 @@
         </svg>
       </span>
     </p>
-    <div class="w-full flex justify-center mt-14">
-      <a href="mailto:lottolaaa@gmail.com" class="btn btn-primary mx-auto text-sm md:text-xl"
-        >CONTACT US</a
-      >
-    </div>
     <div
       class="flex flex-col items-center my-10 mx-5 justify-evenly h-[600px] border-1 border-white/50 rounded-lg md:hidden"
     >
       <div class="flex flex-col items-center w-[90%]">
-        <img src="/lottola.jpg" alt="" class="w-30" />
+        <img src="/lottola.jpg" alt="" class="w-30 rounded-full" />
         <div class="">
           <h2 class="text-center font-corben font-bold mt-3">LOT TOLA</h2>
           <p class="text-xs italic opacity-50 mt-3">FRONTEND DEV</p>
@@ -59,13 +54,14 @@
         </div>
       </div>
       <div class="flex flex-col items-center w-[90%]">
-        <img src="/kienghok.png" alt="" class="w-30" />
+        <img src="/kienghok.png" alt="" class="w-30 rounded-full" />
         <div class="">
           <h2 class="text-center font-corben font-bold mt-3">KHEAV KIENGHOK</h2>
           <p class="text-xs italic opacity-50 mt-3">BACKEND DEV</p>
           <p class="mt-3">
-            Keeps the servers alive and the data flowing. Talks to databases like they’re
-            pets—sometimes they bite. Powered by VibeCoding.
+            I speak to databases like they understand me, because code deserves conversation. My
+            servers don’t just run — they breathe life into data. I build tech with soul, not just
+            syntax.
           </p>
         </div>
       </div>
@@ -104,6 +100,11 @@
         alt=""
         class="col-start-2 row-start-2 my-auto rounded-lg max-w-[80%] mx-auto"
       />
+    </div>
+    <div class="w-full flex justify-center">
+      <a href="mailto:lottolaaa@gmail.com" class="btn btn-primary mx-auto text-sm md:text-xl mb-10"
+        >CONTACT US</a
+      >
     </div>
   </div>
 </template>
