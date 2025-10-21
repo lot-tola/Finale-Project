@@ -14,23 +14,32 @@ let scholarships = ref([])
 const dataStore = useDataStore()
 const router = useRouter()
 const routeName = ref('')
+const searchQuery = ref('')
+const originalData = ref([])
 routeName.value = router.currentRoute.value.name
 
 const filterValidOpportunities = (scholarships) => {
   const filteredOpportunities = scholarships.filter((s) => new Date(s.deadline_end) > Date.now())
   return filteredOpportunities
 }
-const originalData = ref([])
+
+const handleSearch = () => {
+  console.log(searchQuery.value)
+  scholarships.value = originalData.value.filter((scholarship) => {
+    return scholarship.provider.toLowerCase().includes(searchQuery.value.toLowerCase())
+  })
+}
+// computed(() => {
+//   scholarships.value = handleSearch()
+// })
 
 watch(
   () => router.currentRoute.value,
   (newRoute) => {
     if (newRoute.name == 'ValidOpportunitiesView') {
-      console.log(newRoute.name)
       scholarships.value = filterValidOpportunities(originalData.value)
     }
     if (newRoute.name == 'OpportunitiesView') {
-      console.log(newRoute.name)
       scholarships.value = originalData.value
     }
   },
@@ -192,36 +201,58 @@ onMounted(async () => {
   <!-- Component 1 -->
   <div class="flex flex-col mt-15 w-full items-center justify-evenly mb-10 relative">
     <canvas id="brandname" class="w-full h-[500px] block mx-auto"></canvas>
-    <div class="absolute top-130 left-10 z-5">
-      <div class="relative group gap-3 pr-30">
-        <i class="pi pi-filter text-2xl transition"></i>
-        <div
-          class="absolute bg-base-100 text-white border-1 border-gray-400/50 rounded-lg group-hover:visible group-hover:opacity-100 invisible w-60 h-fit"
-        >
-          <p class="text-xl font-extrabold text-center mt-5">Category</p>
-          <ul class="flex flex-col items-center gap-5 my-5">
-            <li
-              class="border-1 w-[90%] p-1 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
+    <div class="absolute top-130 left-[50%] transform -translate-x-[50%] z-5 w-fit">
+      <div class="flex gap-4 items-start">
+        <div class="w-fit h-full rounded-lg">
+          <form @submit.prevent="handleSearch" class="flex flex-col items-center gap-4">
+            <input
+              type="text"
+              class="text-2xl input input-primary h-18"
+              placeholder="Type anything to search"
+              v-model="searchQuery"
+            />
+            <button class="button" type="submit"><span>Search</span></button>
+          </form>
+        </div>
+        <div class="flex justify-evenly border-1 items-center py-5 rounded-lg w-200">
+          <div class="relative">
+            <input type="checkbox" class="peer hidden" id="sort" />
+            <label for="sort" class="cursor-pointer">
+              <div class="flex items-center gap-4">
+                <i class="pi pi-sort-amount-down text-2xl"></i>
+                <p class="text-2xl">Sort</p>
+              </div>
+            </label>
+            <ul
+              class="absolute invisible peer-checked:visible w-50 h-fit flex flex-col mt-5 bg-[#793ef9] items-center py-4 rounded-lg"
             >
-              IT
-            </li>
-            <li
-              class="border-1 w-[90%] p-1 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+                Newest
+              </li>
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+                Oldest
+              </li>
+            </ul>
+          </div>
+          <div class="relative">
+            <input type="checkbox" class="peer hidden" id="filter" />
+            <label for="filter" class="cursor-pointer">
+              <div class="flex items-center gap-4">
+                <i class="pi pi-filter-fill text-2xl"></i>
+                <p class="text-2xl">Filter</p>
+              </div>
+            </label>
+            <ul
+              class="absolute invisible peer-checked:visible w-50 h-fit flex flex-col mt-5 bg-[#793ef9] items-center py-4 rounded-lg"
             >
-              Businness
-            </li>
-
-            <li
-              class="border-1 w-[90%] p-1 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
-            >
-              Law
-            </li>
-            <li
-              class="border-1 w-[90%] p-1 rounded-lg hover:bg-gray-400/50 border-gray-400/50 text-center"
-            >
-              International Relation
-            </li>
-          </ul>
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+                School
+              </li>
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+                Major
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

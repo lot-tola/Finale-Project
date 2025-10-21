@@ -8,6 +8,8 @@ const totp = ref('')
 const qrcode = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
+const isVerifyTOTP = ref(false)
+const isAdminLogin = ref(true)
 let authToken = null
 
 const handleSubmit = async () => {
@@ -21,22 +23,28 @@ const handleSubmit = async () => {
       'https://eduvision.live/api/admin/login',
       JSON.stringify(loginObj),
     )
+    console.log(resp.data)
     if (resp.data.success) {
-      authToken = resp.data.data.temp_token
+      if (resp.data.data.next == '/admin/verify-otp') {
+        isVerifyTOTP.value = true
+        isAdminLogin.value = false
+      } else if (resp.data.data.next == '/admin/enable-2fa') {
+        isAdminLogin.value = false
+        authToken = resp.data.data.setup_token
+        const verification = await axios.post(
+          'https://eduvision.live/api/admin/enable-2fa',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          },
+        )
+        qrcode.value = verification.data.data.qr_code_url
+        console.log(qrcode.value)
+        loading.value = false
+      }
     }
-    console.log('RESPONSE', resp.data.data)
-    console.log('TOKEN', authToken)
-    const verification = await axios.post(
-      'https://eduvision.live/api/admin/enable-2fa',
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      },
-    )
-    qrcode.value = verification.data.data.qr_code_url
-    loading.value = false
   } catch (err) {
     console.log('Error registering admin', err)
     errorMsg.value = 'Something Went Wrong. Plase try again.'
@@ -51,6 +59,7 @@ const handleVerification = async (e) => {
   try {
     e.preventDefault()
     loading.value = true
+    console.log(totp.value)
     const resp = await axios.post(
       'https://eduvision.live/api/admin/verify-2fa',
       { otp: totp.value },
@@ -61,6 +70,7 @@ const handleVerification = async (e) => {
       },
     )
     console.log(resp.data)
+    isAdminLogin.value = true
   } catch (err) {
     loading.value = false
     errorMsg.value = 'Something Went Wrong. Please Try Again.'
