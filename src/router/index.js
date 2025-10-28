@@ -55,7 +55,7 @@ const router = createRouter({
     {
       path: '/admin/edit-opportunity',
       name: 'EditOpportunity',
-      component: () => import('../views/EditOpportunityView.vue'),
+      component: () => import('../views/EditOpportunity.vue'),
     },
     {
       path: '/unauthorized',

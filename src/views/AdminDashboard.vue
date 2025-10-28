@@ -1,58 +1,79 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { prettyPrintJson } from 'pretty-print-json'
-import EditOpportunity from './EditOpportunityView.vue'
 const router = useRouter()
-const allOpportunities = ref({})
-const container = null
+import axios from 'axios'
+const allScholarships = ref([])
 const fetchData = async () => {
   const resp = await axios.get('https://eduvision.live/api/scholarships')
-  allOpportunities.value = resp.data.data
+  console.log(resp.data)
+  if (resp.data.success) {
+    allScholarships.value = resp.data.data
+  }
 }
+
 onMounted(async () => {
   await fetchData()
-  const container = document.getElementById('container')
-  for (let data of allOpportunities.value) {
-    const originalData = data
-
-    data = JSON.stringify(data)
-    const div = document.createElement('div')
-    div.className = 'relative'
-
-    // Edit button
-    const button = document.createElement('button')
-    const span = document.createElement('span')
-    button.className = 'absolute left-[90%] top-5 button'
-    span.textContent = 'Edit'
-    button.appendChild(span)
-    button.addEventListener('click', (event) => {
-      router.push({ path: '/admin/edit-opportunity', query: { id: originalData.id } })
-    })
-
-    // Delete Button
-    const editButton = document.createElement('button')
-    const editSpan = document.createElement('span')
-    editButton.className = 'absolute left-[80%] top-5 button'
-    editSpan.textContent = 'Delete'
-    editButton.appendChild(editSpan)
-    editButton.addEventListener('click', () => {})
-
-    const pre = document.createElement('pre')
-    pre.innerHTML = prettyPrintJson.toHtml(JSON.parse(data))
-    pre.className =
-      'text-2xl/relaxed  rounded-lg bg-gray-400/20 mx-auto mt-10 p-10 overflow-y-scroll'
-    div.appendChild(editButton)
-    div.appendChild(button)
-    div.appendChild(pre)
-    container.appendChild(div)
-  }
 })
 </script>
 <template>
-  <div class="w-full h-screen">
-    <h1 class="text-center text-4xl w-full mt-4 font-extralight font-ultra">Admin Dashboard</h1>
-    <div id="container" class="w-[90%] mx-auto p-7"></div>
+  <div class="w-full flex flex-col items-center gap-20 text-lg/relaxed mb-15">
+    <div class="border-1 w-[50%] relative p-12 rounded-lg" v-for="scholarship in allScholarships">
+      <img :src="scholarship.photo_url" alt="" class="w-60 rounded-lg mx-auto" />
+      <div class="absolute right-5 top-4">
+        <button
+          @click="router.push({ name: 'EditOpportunity', query: { id: scholarship.id } })"
+          class="btn btn-primary mr-2"
+        >
+          Edit
+        </button>
+        <button class="btn btn-primary">Delete</button>
+      </div>
+      <div class="mt-6 flex flex-col items-start gap-4">
+        <p class="">
+          <span class="italic text-red-400 font-bold">TITLE: </span>{{ scholarship.title }}
+        </p>
+        <p>
+          <span class="italic text-red-400 font-bold">DESCRIPTION: </span
+          >{{ scholarship.description }}
+        </p>
+        <p>
+          <span class="italic text-red-400 font-bold">PROVIDER: </span>{{ scholarship.provider }}
+        </p>
+        <p>
+          <span class="italic text-red-400 font-bold">DEADLINE: </span
+          >{{ scholarship.deadline_end }}
+        </p>
+      </div>
+      <div class="w-full mt-6">
+        <p class="border-t-1 border-t-gray-400 mx-auto w-fit pt-4 font-extrabold text-red-400">
+          REQUIREMENTS
+        </p>
+        <div v-for="(val, key, idx) in scholarship.requirements">
+          <p class="text-red-400 font-bold">{{ key.split('_').join(' ').toUpperCase() }}</p>
+          <ul class="list-disc">
+            <li class="ml-6" v-for="item in val">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="w-full mt-6">
+        <p class="border-t-1 border-t-gray-400 mx-auto w-fit pt-4 font-extrabold text-red-400 mb-4">
+          INSTITUTION INFORMATION
+        </p>
+        <div v-for="val in scholarship.institution_info">
+          <p class="">
+            <span class="text-red-400 font-bold">INSTITUTION NAME: </span>{{ val.institution }}
+          </p>
+          <p class="text-red-400 font-bold">PROGRAMS OFFERED:</p>
+          <ul class="list-disc">
+            <li class="ml-6" v-for="item in val.programs_offered">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-full grid place-content-center mt-4">
+        <button class="btn btn-primary">See Original</button>
+      </div>
+    </div>
   </div>
 </template>

@@ -24,14 +24,31 @@ const filterValidOpportunities = (scholarships) => {
 }
 
 const handleSearch = () => {
-  console.log(searchQuery.value)
+  const query = searchQuery.value.trim().toLowerCase()
+
+  const extractText = (data) => {
+    let text = ''
+
+    if (typeof data === 'string') {
+      text += data.toLowerCase() + ' '
+    } else if (Array.isArray(data)) {
+      data.forEach((item) => {
+        text += extractText(item)
+      })
+    } else if (typeof data === 'object' && data !== null) {
+      Object.values(data).forEach((value) => {
+        text += extractText(value)
+      })
+    }
+
+    return text
+  }
+
   scholarships.value = originalData.value.filter((scholarship) => {
-    return scholarship.provider.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const searchableText = extractText(scholarship)
+    return searchableText.includes(query)
   })
 }
-// computed(() => {
-//   scholarships.value = handleSearch()
-// })
 
 watch(
   () => router.currentRoute.value,
@@ -328,6 +345,9 @@ onMounted(async () => {
 
       <!-- Big display -->
       <div class="md:block relative hidden overscroll-auto h-[900px] mt-70 z-1">
+        <div class="absolute top-20 right-3">
+          <i class="pi pi-heart-fill w-50"></i>
+        </div>
         <div
           v-if="dat.photo_url"
           class="bg-no-repeat blur-[3px] bg-center bg-cover h-full absolute inset-0 -z-3"

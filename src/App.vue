@@ -10,7 +10,8 @@ const route = useRoute()
       v-if="
         route.name == 'AdminDashboard' ||
         route.name == 'CreateOpportunity' ||
-        route.name == 'AdminLogin'
+        route.name == 'AdminLogin' ||
+        route.name == 'EditOpportunity'
       "
     />
     <HomeNavbar v-else />

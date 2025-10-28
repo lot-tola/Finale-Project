@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onBeforeUnmount, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 const email = ref('')
 const password = ref('')
@@ -10,7 +11,9 @@ const loading = ref(false)
 const errorMsg = ref('')
 const isVerifyTOTP = ref(false)
 const isAdminLogin = ref(true)
-let authToken = null
+const setup_token = ref('')
+const temp_token = ref('')
+const router = useRouter()
 
 const handleSubmit = async () => {
   loading.value = true
@@ -25,25 +28,50 @@ const handleSubmit = async () => {
     )
     console.log(resp.data)
     if (resp.data.success) {
-      if (resp.data.data.next == '/admin/verify-otp') {
-        isVerifyTOTP.value = true
-        isAdminLogin.value = false
-      } else if (resp.data.data.next == '/admin/enable-2fa') {
-        isAdminLogin.value = false
-        authToken = resp.data.data.setup_token
+      if (!resp.data.data.is_multi_factor) {
+        setup_token.value = resp.data.data.setup_token
+        console.log(setup_token)
+
         const verification = await axios.post(
           'https://eduvision.live/api/admin/enable-2fa',
           {},
           {
             headers: {
-              Authorization: `Bearer ${authToken}`,
+              Authorization: `Bearer ${setup_token.value}`,
             },
           },
         )
         qrcode.value = verification.data.data.qr_code_url
         console.log(qrcode.value)
+        console.log(verification.data)
+        loading.value = false
+        isAdminLogin.value = false
+      }
+      if (resp.data.data.is_multi_factor) {
+        temp_token.value = resp.data.data.temp_token
+        isVerifyTOTP.value = true
+        isAdminLogin.value = false
         loading.value = false
       }
+      // if (resp.data.data.next == '/admin/verify-otp') {
+      //   isVerifyTOTP.value = true
+      //   isAdminLogin.value = false
+      // } else if (resp.data.data.next == '/admin/enable-2fa') {
+      //   isAdminLogin.value = false
+      //   authToken = resp.data.data.setup_token
+      //   const verification = await axios.post(
+      //     'https://eduvision.live/api/admin/enable-2fa',
+      //     {},
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${authToken}`,
+      //       },
+      //     },
+      //   )
+      //   qrcode.value = verification.data.data.qr_code_url
+      //   console.log(qrcode.value)
+      //   loading.value = false
+      // }
     }
   } catch (err) {
     console.log('Error registering admin', err)
@@ -55,9 +83,30 @@ const handleBeforeUnload = (e) => {
   e.preventDefault()
   e.returnValue = ''
 }
-const handleVerification = async (e) => {
+const handleVerify2FA = async () => {
   try {
-    e.preventDefault()
+    loading.value = true
+    console.log(totp.value)
+    const resp = await axios.post(
+      'https://eduvision.live/api/admin/verify-otp',
+      { otp: totp.value },
+      {
+        headers: {
+          Authorization: `Bearer ${temp_token.value}`,
+        },
+      },
+    )
+    if (resp.data.success) {
+      router.push({ name: 'AdminDashboard' })
+    }
+  } catch (err) {
+    loading.value = false
+    errorMsg.value = 'Something Went Wrong. Please Try Again.'
+    console.log('Error verification', err)
+  }
+}
+const handleVerification = async () => {
+  try {
     loading.value = true
     console.log(totp.value)
     const resp = await axios.post(
@@ -65,12 +114,14 @@ const handleVerification = async (e) => {
       { otp: totp.value },
       {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${setup_token.value}`,
         },
       },
     )
     console.log(resp.data)
-    isAdminLogin.value = true
+    if (resp.data.success) {
+      router.push({ name: 'AdminLogin' })
+    }
   } catch (err) {
     loading.value = false
     errorMsg.value = 'Something Went Wrong. Please Try Again.'
@@ -103,6 +154,12 @@ onBeforeUnmount(() => {
         </svg>
         <span>{{ errorMsg }}</span>
       </div>
+      <div v-if="isVerifyTOTP">
+        <form @submit.prevent="handleVerify2FA">
+          <input type="text" v-model="totp" placeholder="XXX-XXX" />
+          <button class="button" type="submit"><span>Verify</span></button>
+        </form>
+      </div>
       <div class="flex flex-col items-center justify-center gap-5" v-if="qrcode">
         <p class="text-center text-xl/relaxed mb-3">
           Please open your authenticator app and scan this QR code to enable 2 Factor Authentication
@@ -122,7 +179,7 @@ onBeforeUnmount(() => {
           <button class="button"><span>Verify</span></button>
         </form>
       </div>
-      <div class="" v-else>
+      <div class="" v-if="isAdminLogin">
         <h1 class="text-center text-2xl font-bold">Admin Login</h1>
         <p class="text-center mt-3">Welcome back Admin!!</p>
         <form @submit.prevent="handleSubmit" class="flex flex-col mt-9 items-center gap-10">
