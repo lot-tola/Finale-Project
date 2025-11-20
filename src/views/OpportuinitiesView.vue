@@ -24,31 +24,14 @@ const filterValidOpportunities = (scholarships) => {
 }
 
 const handleSearch = () => {
-  const query = searchQuery.value.trim().toLowerCase()
-
-  const extractText = (data) => {
-    let text = ''
-
-    if (typeof data === 'string') {
-      text += data.toLowerCase() + ' '
-    } else if (Array.isArray(data)) {
-      data.forEach((item) => {
-        text += extractText(item)
-      })
-    } else if (typeof data === 'object' && data !== null) {
-      Object.values(data).forEach((value) => {
-        text += extractText(value)
-      })
-    }
-
-    return text
-  }
-
+  console.log(searchQuery.value)
   scholarships.value = originalData.value.filter((scholarship) => {
-    const searchableText = extractText(scholarship)
-    return searchableText.includes(query)
+    return scholarship.provider.toLowerCase().includes(searchQuery.value.toLowerCase())
   })
 }
+// computed(() => {
+//   scholarships.value = handleSearch()
+// })
 
 watch(
   () => router.currentRoute.value,
@@ -83,6 +66,25 @@ const handleAddFavorite = async (dat) => {
   } catch (err) {
     console.log(err)
   }
+}
+
+const handleFilter = (major) => {
+  scholarships.value = originalData.value.filter((data) => data.categories == major)
+}
+
+const handleSort = (input) => {
+  if (input === 'Newest') {
+    scholarships.value = originalData.value.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    )
+  }
+
+  if (input === 'Oldest') {
+    scholarships.value = originalData.value.sort(
+      (a, b) => new Date(a.created_at) - new Date(b.created_at),
+    )
+  }
+  return
 }
 
 onMounted(async () => {
@@ -145,7 +147,7 @@ onMounted(async () => {
     textMat.shininess = 150
     const brand = 'EduVision'
     loader.load(
-      '/fonts/ttf/NotoSerif-VariableFont_wdth,wght.ttf',
+      '/fonts/ttf/noto-serif.ttf',
       function (ttfData) {
         fontData = new FontLoader().parse(ttfData)
         textMesh = createText(fontData)
@@ -190,28 +192,27 @@ onMounted(async () => {
     }
   }
   initBrand3D()
-  console.log(scholarships.value)
-  onBeforeUnmount(() => {
-    cancelAnimationFrame(animationId)
-    if (renderer) {
-      renderer.dispose()
-    }
-    if (scene) {
-      scene.traverse((obj) => {
-        if (!obj.isMesh) return
-        if (obj.geometry) {
-          obj.geometry.dispose()
-        }
-        if (obj.material) {
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((mat) => mat.dispose())
-          } else {
-            material.dispose()
-          }
-        }
-      })
-    }
-  })
+  // onBeforeUnmount(() => {
+  //   cancelAnimationFrame(animationId)
+  //   if (renderer) {
+  //     renderer.dispose()
+  //   }
+  //   if (scene) {
+  //     scene.traverse((obj) => {
+  //       if (!obj.isMesh) return
+  //       if (obj.geometry) {
+  //         obj.geometry.dispose()
+  //       }
+  //       if (obj.material) {
+  //         if (Array.isArray(obj.material)) {
+  //           obj.material.forEach((mat) => mat.dispose())
+  //         } else {
+  //           material.dispose()
+  //         }
+  //       }
+  //     })
+  //   }
+  // })
 })
 </script>
 <template>
@@ -232,8 +233,7 @@ onMounted(async () => {
           </form>
         </div>
         <div class="flex justify-evenly border-1 items-center py-5 rounded-lg w-200">
-          <div class="relative">
-            <input type="checkbox" class="peer hidden" id="sort" />
+          <div class="relative group">
             <label for="sort" class="cursor-pointer">
               <div class="flex items-center gap-4">
                 <i class="pi pi-sort-amount-down text-2xl"></i>
@@ -241,18 +241,23 @@ onMounted(async () => {
               </div>
             </label>
             <ul
-              class="absolute invisible peer-checked:visible w-50 h-fit flex flex-col mt-5 bg-[#793ef9] items-center py-4 rounded-lg"
+              class="absolute invisible group-hover:visible w-50 h-fit flex flex-col bg-[#793ef9] items-center py-4 rounded-lg left-[50%] top-[100%] translate-x-[-50%]"
             >
-              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+              <li
+                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
+                @click="handleSort('Newest')"
+              >
                 Newest
               </li>
-              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+              <li
+                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
+                @click="handleSort('Oldest')"
+              >
                 Oldest
               </li>
             </ul>
           </div>
-          <div class="relative">
-            <input type="checkbox" class="peer hidden" id="filter" />
+          <div class="relative group">
             <label for="filter" class="cursor-pointer">
               <div class="flex items-center gap-4">
                 <i class="pi pi-filter-fill text-2xl"></i>
@@ -260,13 +265,19 @@ onMounted(async () => {
               </div>
             </label>
             <ul
-              class="absolute invisible peer-checked:visible w-50 h-fit flex flex-col mt-5 bg-[#793ef9] items-center py-4 rounded-lg"
+              class="absolute invisible group-hover:visible w-50 h-fit flex flex-col bg-[#793ef9] items-center py-4 rounded-lg top-[100%] left-[50%] translate-x-[-50%]"
             >
-              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
-                School
+              <li
+                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
+                @click="handleFilter('IT')"
+              >
+                IT
               </li>
-              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
-                Major
+              <li
+                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
+                @click="handleFilter('Business')"
+              >
+                Business
               </li>
             </ul>
           </div>
@@ -345,9 +356,6 @@ onMounted(async () => {
 
       <!-- Big display -->
       <div class="md:block relative hidden overscroll-auto h-[900px] mt-70 z-1">
-        <div class="absolute top-20 right-3">
-          <i class="pi pi-heart-fill w-50"></i>
-        </div>
         <div
           v-if="dat.photo_url"
           class="bg-no-repeat blur-[3px] bg-center bg-cover h-full absolute inset-0 -z-3"
