@@ -1,9 +1,7 @@
 <script setup>
-import { useColorMode } from './useColorMode.js'
 import { ref, onMounted, watch, computed } from 'vue'
 import { isAuthenticate, getUserName, checkExpired, logout, token } from '@/lib/helper.js'
 import { useRouter } from 'vue-router'
-const { mode, set, toggle } = useColorMode()
 
 const router = useRouter()
 const authenticated = ref()

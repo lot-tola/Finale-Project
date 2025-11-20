@@ -68,25 +68,6 @@ const handleAddFavorite = async (dat) => {
   }
 }
 
-const handleFilter = (major) => {
-  scholarships.value = originalData.value.filter((data) => data.categories == major)
-}
-
-const handleSort = (input) => {
-  if (input === 'Newest') {
-    scholarships.value = originalData.value.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at),
-    )
-  }
-
-  if (input === 'Oldest') {
-    scholarships.value = originalData.value.sort(
-      (a, b) => new Date(a.created_at) - new Date(b.created_at),
-    )
-  }
-  return
-}
-
 onMounted(async () => {
   await fetchData()
   function initBrand3D() {
@@ -192,27 +173,27 @@ onMounted(async () => {
     }
   }
   initBrand3D()
-  // onBeforeUnmount(() => {
-  //   cancelAnimationFrame(animationId)
-  //   if (renderer) {
-  //     renderer.dispose()
-  //   }
-  //   if (scene) {
-  //     scene.traverse((obj) => {
-  //       if (!obj.isMesh) return
-  //       if (obj.geometry) {
-  //         obj.geometry.dispose()
-  //       }
-  //       if (obj.material) {
-  //         if (Array.isArray(obj.material)) {
-  //           obj.material.forEach((mat) => mat.dispose())
-  //         } else {
-  //           material.dispose()
-  //         }
-  //       }
-  //     })
-  //   }
-  // })
+  onBeforeUnmount(() => {
+    cancelAnimationFrame(animationId)
+    if (renderer) {
+      renderer.dispose()
+    }
+    if (scene) {
+      scene.traverse((obj) => {
+        if (!obj.isMesh) return
+        if (obj.geometry) {
+          obj.geometry.dispose()
+        }
+        if (obj.material) {
+          if (Array.isArray(obj.material)) {
+            obj.material.forEach((mat) => mat.dispose())
+          } else {
+            material.dispose()
+          }
+        }
+      })
+    }
+  })
 })
 </script>
 <template>
@@ -234,6 +215,7 @@ onMounted(async () => {
         </div>
         <div class="flex justify-evenly border-1 items-center py-5 rounded-lg w-200">
           <div class="relative group">
+            <input type="checkbox" class="peer hidden" id="sort" />
             <label for="sort" class="cursor-pointer">
               <div class="flex items-center gap-4">
                 <i class="pi pi-sort-amount-down text-2xl"></i>
@@ -241,18 +223,12 @@ onMounted(async () => {
               </div>
             </label>
             <ul
-              class="absolute invisible group-hover:visible w-50 h-fit flex flex-col bg-[#793ef9] items-center py-4 rounded-lg left-[50%] top-[100%] translate-x-[-50%]"
+              class="absolute invisible group-hover:visible w-50 h-fit flex flex-col top-[100%] left-[50%] -translate-x-[50%] bg-[#793ef9] items-center py-4 rounded-lg"
             >
-              <li
-                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
-                @click="handleSort('Newest')"
-              >
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
                 Newest
               </li>
-              <li
-                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
-                @click="handleSort('Oldest')"
-              >
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
                 Oldest
               </li>
             </ul>
@@ -267,24 +243,23 @@ onMounted(async () => {
             <ul
               class="absolute invisible group-hover:visible w-50 h-fit flex flex-col bg-[#793ef9] items-center py-4 rounded-lg top-[100%] left-[50%] translate-x-[-50%]"
             >
-              <li
-                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
-                @click="handleFilter('IT')"
-              >
-                IT
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+                School
               </li>
-              <li
-                class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg"
-                @click="handleFilter('Business')"
-              >
-                Business
+              <li class="hover:bg-gray-400/80 w-full text-center py-2 cursor-pointer rounded-lg">
+                Major
               </li>
             </ul>
           </div>
         </div>
       </div>
     </div>
-    <div v-for="(dat, key, index) in scholarships" class="w-[75%]" :key="dat.id">
+    <div v-if="scholarships.length === 0" class="absolute top-175">
+      <p class="font-corben text-3xl">
+        There is nothing to show. Maybe try to adjust your filter view.
+      </p>
+    </div>
+    <div v-else v-for="(dat, key, index) in scholarships" class="w-[75%]" :key="dat.id">
       <div class="border-1 border-white/50 rounded-lg md:hidden">
         <div class="max-h-[500px] overflow-y-scroll arounded-lg p-6 flex flex-col items-center">
           <img :src="`${dat.photo_url}`" alt="" class="w-[200px] rounded-lg" />
