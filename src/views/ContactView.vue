@@ -81,6 +81,7 @@ const handleSubmit = async () => {
             <label for="firstname " class="block mb-2" name="firstname"
               >First Name <span class="text-red-500">*</span></label
             >
+
             <input
               v-model="firstName"
               type="text"
@@ -126,7 +127,7 @@ const handleSubmit = async () => {
           />
         </div>
         <span v-if="messageState.loading" class="loading loading-dots loading-lg mx-auto"></span>
-        <button v-else type="submit" class="button mx-auto"><span>Send</span></button>
+        <button v-else type="submit" class="button mx-auto mt-2"><span>Send</span></button>
       </form>
     </div>
     <div class="flex gap-10 items-center col-span-3 row-start-2 mx-auto">
